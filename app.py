@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 import joblib
 from tensorflow.keras.models import load_model
+import os
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -24,7 +25,6 @@ def predict():
     try:
         data = request.get_json()
 
-        # Extract form data
         input_dict = {
             "Gender": data.get("Gender", ""),
             "UG_Course": data.get("UG_Course", ""),
@@ -40,23 +40,18 @@ def predict():
             "Masters_Field": data.get("Masters_Field", "")
         }
 
-        # Create and one-hot encode DataFrame
         input_df = pd.DataFrame([input_dict])
         input_encoded = pd.get_dummies(input_df)
 
-        # Handle missing columns (⚡ optimized and avoids fragmentation warning)
         missing_cols = set(feature_names) - set(input_encoded.columns)
-        missing_df = pd.DataFrame(0, index=[0], columns=list(missing_cols))
-        input_encoded = pd.concat([input_encoded, missing_df], axis=1)
+        for col in missing_cols:
+            input_encoded[col] = 0
 
-        # Reorder columns and defragment DataFrame
         input_encoded = input_encoded[feature_names].copy()
 
-        # Scale CGPA
         if 'CGPA' in input_encoded.columns:
             input_encoded[['CGPA']] = scaler.transform(input_encoded[['CGPA']])
 
-        # Predict career
         prediction = model.predict(input_encoded)
         predicted_index = np.argmax(prediction)
         predicted_career = label_encoder.inverse_transform([predicted_index])[0]
@@ -67,9 +62,6 @@ def predict():
         return jsonify({'error': str(e)})
 
 # Run app
-import os
-
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=int(os.environ.get('PORT', 10000)), debug=True)
-
-
+    port = int(os.environ.get('PORT', 10000))  # Default to 10000 if PORT not set
+    app.run(host="0.0.0.0", port=port)
