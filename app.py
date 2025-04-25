@@ -9,7 +9,11 @@ import os
 app = Flask(__name__)
 
 # CORS: full support for frontend
-CORS(app, resources={r"/*": {"origins": "https://career-frontend-azure.vercel.app"}}, supports_credentials=True)
+CORS(app, resources={r"/*": {"origins": [
+    "https://career-frontend-azure.vercel.app",
+    "http://127.0.0.1:5500",
+    "http://localhost:5500"
+]}}, supports_credentials=True)
 
 model = load_model("career_model.h5")
 label_encoder = joblib.load("label_encoder.pkl")
