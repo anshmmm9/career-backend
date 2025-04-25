@@ -6,15 +6,15 @@ import joblib
 from tensorflow.keras.models import load_model
 import os
 
-# Initialize Flask app
 app = Flask(__name__)
-CORS(app, origins=["https://career-frontend-azure.vercel.app"])
 
-# Load model and encoders
+# CORS: full support for frontend
+CORS(app, resources={r"/*": {"origins": "https://career-frontend-azure.vercel.app"}}, supports_credentials=True)
+
 model = load_model("career_model.h5")
 label_encoder = joblib.load("label_encoder.pkl")
 scaler = joblib.load("scaler.pkl")
-feature_names = joblib.load("features.pkl")  # list of feature columns from training
+feature_names = joblib.load("features.pkl")
 
 @app.route('/')
 def home():
@@ -59,11 +59,8 @@ def predict():
         return jsonify({'career': predicted_career})
 
     except Exception as e:
-        return jsonify({'error': str(e)}
-                       )
-    
+        return jsonify({'error': str(e)})
 
-# Run app
 if __name__ == "__main__":
-    port = int(os.environ.get('PORT', 10000))  # Default to 10000 if PORT not set
+    port = int(os.environ.get('PORT', 10000))
     app.run(host="0.0.0.0", port=port)
