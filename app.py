@@ -8,7 +8,7 @@ import os
 
 # Initialize Flask app
 app = Flask(__name__)
-CORS(app)
+CORS(app, origins=["https://career-frontend-azure.vercel.app"])
 
 # Load model and encoders
 model = load_model("career_model.h5")
@@ -59,7 +59,9 @@ def predict():
         return jsonify({'career': predicted_career})
 
     except Exception as e:
-        return jsonify({'error': str(e)})
+        return jsonify({'error': str(e)}
+                       )
+    
 
 # Run app
 if __name__ == "__main__":
