@@ -8,13 +8,15 @@ import os
 
 app = Flask(__name__)
 
-# CORS: full support for frontend
+# ✅ CORS: Allow requests from deployed frontend and local development
 CORS(app, resources={r"/*": {"origins": [
     "https://career-frontend-azure.vercel.app",
+    "https://career-frontend-git-main-anshuls-projects-050b9017.vercel.app",
     "http://127.0.0.1:5500",
     "http://localhost:5500"
 ]}}, supports_credentials=True)
 
+# Load model and preprocessors
 model = load_model("career_model.h5")
 label_encoder = joblib.load("label_encoder.pkl")
 scaler = joblib.load("scaler.pkl")
